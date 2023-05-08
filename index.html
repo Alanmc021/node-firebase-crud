@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Enviar Dados para Endpoint</title>
+</head>
+<body>
+  <h1>Enviar Dados para Endpoint</h1>
+  <form id="form-dados">
+    <label for="nome">Nome:</label>
+    <input type="text" id="nome" name="nome">
+    <br>
+    <label for="idade">Idade:</label>
+    <input type="text" id="idade" name="idade">
+    <br>
+    <button type="submit">Enviar</button>
+  </form>
+
+  <script>
+    const formDados = document.getElementById('form-dados');
+    formDados.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const nome = document.getElementById('nome').value;
+      const idade = document.getElementById('idade').value;
+
+      // Enviar os dados para o endpoint
+      fetch('http://localhost:3000/jogador', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          nome,
+          idade
+        })
+      })
+      .then(response => response.text())
+      .then(data => console.log(data))
+      .catch(error => console.error(error));
+    });
+  </script>
+</body>
+</html>
