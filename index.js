@@ -14,6 +14,37 @@ admin.initializeApp({
   databaseURL: "https://teste-node-senai-default-rtdb.firebaseio.com"
 });
 
+// Registra um novo usuário
+app.post('/signup', (req, res) => {
+    const { email, password } = req.body;
+    admin.auth().createUser({
+        email: email,
+        password: password
+    })
+        .then(() => {
+            res.status(201).send('Usuário registrado com sucesso');
+        })
+        .catch(error => {
+            res.status(500).send(error);
+        });
+});
+
+// Faz login com um usuário existente
+app.post('/login',
+  body('email').isEmail(),
+  body('password').isLength({ min: 6 }),
+  validateRequest,
+  (req, res) => {
+    const { email, password } = req.body;
+    admin.auth().signInWithEmailAndPassword(email, password)
+      .then(() => {
+        res.send('Login bem-sucedido');
+      })
+      .catch(error => {
+        res.status(500).send(error);
+      });
+  });
+
 // Cria uma nova pessoa
 app.post('/pessoas', (req, res) => {
   const pessoa = req.body;
