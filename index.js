@@ -1,49 +1,81 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const admin = require('firebase-admin');
-const cors = require('cors');
+
+const { getAuth } = require('firebase-admin/auth');
+
 
 const app = express();
-app.use(cors());
 app.use(bodyParser.json());
 
 // Inicializa o Firebase
 const serviceAccount = require('./chave.json');
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://teste-node-senai-default-rtdb.firebaseio.com"
+  databaseURL: ""
 });
 
-// Registra um novo usuário
+const auth2 = getAuth();
+
+//Criar um novo usuario
 app.post('/signup', (req, res) => {
-    const { email, password } = req.body;
-    admin.auth().createUser({
-        email: email,
-        password: password
+  const { email, password } = req.body;
+  admin.auth().createUser({
+    email: email,
+    password: password
+  })
+    .then(() => {
+      res.status(201).send('Usuário registrado com sucesso');
     })
-        .then(() => {
-            res.status(201).send('Usuário registrado com sucesso');
-        })
-        .catch(error => {
-            res.status(500).send(error);
-        });
+    .catch(error => {
+      res.status(500).send(error);
+    });
 });
 
-// Faz login com um usuário existente
-app.post('/login',
-  body('email').isEmail(),
-  body('password').isLength({ min: 6 }),
-  validateRequest,
-  (req, res) => {
-    const { email, password } = req.body;
-    admin.auth().signInWithEmailAndPassword(email, password)
-      .then(() => {
-        res.send('Login bem-sucedido');
-      })
-      .catch(error => {
-        res.status(500).send(error);
-      });
-  });
+//Login de um novo usuario 
+// app.post('/login', (req, res) => {
+//   const email = req.body.email;
+//   const password = req.body.password;
+
+//   // Autentica o usuário com email e senha usando o SDK do Firebase para clientes
+//   admin.auth().getUserByEmail(email)
+//     .then(user => {
+//       return admin.auth().createCustomToken(user.uid);
+//     })
+//     .then(customToken => {
+//       // Retorna o token personalizado para o front-end
+//       res.json({ token: customToken });
+//     })
+//     .catch(err => {
+//       console.log('Erro ao autenticar usuário:', err);
+//       res.status(401).send('Credenciais inválidas');
+//     });
+// });
+
+app.post("/forgot-password", (req, res) => {
+  const email = req.body.email;
+  auth2.generatePasswordResetLink(email)
+    .then((link) => {
+      res.send(link)
+    })
+    .catch((error) => {
+      // trate o erro aqui
+    });
+})
+
+// //Reset 
+// app.post('/forgot-password', (req, res) => {
+//   const email = req.body.email;
+
+//   admin.auth().sendPasswordResetEmail(email)
+//     .then(() => {
+//       res.send('Email de recuperação de senha enviado com sucesso!');
+//     })
+//     .catch((error) => {
+//       console.error(error);
+//       res.status(500).send('Erro ao enviar email de recuperação de senha');
+//     });
+// });
 
 // Cria uma nova pessoa
 app.post('/pessoas', (req, res) => {
