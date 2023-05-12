@@ -53,15 +53,16 @@ app.post('/signup', (req, res) => {
 // });
 
 app.post("/forgot-password", (req, res) => {
-  const email = req.body.email;
-  auth2.generatePasswordResetLink(email)
-    .then((link) => {
-      res.send(link)
-    })
-    .catch((error) => {
-      // trate o erro aqui
-    });
+    const email = req.body.email;
+    admin.auth().generatePasswordResetLink(email)
+        .then((link) => {
+            res.send(link)
+        })
+        .catch((error) => {
+            // trate o erro aqui
+        });
 })
+
 
 // //Reset 
 // app.post('/forgot-password', (req, res) => {
