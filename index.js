@@ -32,6 +32,23 @@ app.post('/signup', (req, res) => {
     });
 });
 
+app.get("/pegarProduto/:id", (req, res) => {
+    const id = req.params.id
+
+    admin.database().ref(`produto/${id}`).once('value')
+        .then((snapshot) => {
+            const produto = snapshot.val()
+            produto.id = snapshot.key;
+            res.send(produto)
+        })
+        .catch((erro) => {
+            res.status(400).send(error);
+        })
+
+
+})
+
+
 //Login de um novo usuario 
 // app.post('/login', (req, res) => {
 //   const email = req.body.email;
